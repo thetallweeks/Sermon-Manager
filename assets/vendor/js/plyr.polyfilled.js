@@ -10003,7 +10003,7 @@ typeof navigator === "object" && (function (global, factory) {
     // 'rewind',
     'play', // 'fast-forward',
     'progress', 'current-time', // 'duration',
-    'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', // 'download',
+    'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'download',
     'fullscreen'],
     settings: ['captions', 'quality', 'speed'],
     // Localisation
