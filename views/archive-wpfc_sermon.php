@@ -10,7 +10,18 @@ get_header(); ?>
 <?php echo wpfc_get_partial( 'content-sermon-wrapper-start' ); ?>
 
 <?php
-echo render_wpfc_sorting();
+// echo render_wpfc_sorting();
+$slug = SermonManager::getOption('archive_slug') ?: "sermon-archives";
+?>
+
+<!-- TODO: Don't hard-code this -->
+<div class="smp-back">
+	<a class="smp-btn" href="/<?php echo $slug ?>">
+		Back to Sermons
+	</a>
+</div>
+
+<?php
 
 if ( have_posts() ) :
 
