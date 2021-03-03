@@ -1,0 +1,270 @@
+// TODO: Get these from the theme
+$primaryColor: #465e71;
+$activeColor: #465e71;
+$btnPadding: 10px 20px;
+$btnBorderWidth: 2px;
+$btnBorderColor: $primaryColor;
+$btnBorderRadius: 5px;
+$btnBackgroundColorHover: #eee;
+$verticalSpace: 2.5em;
+
+.smp-btn {
+  display: inline-block;
+  border: $btnBorderWidth solid $btnBorderColor;
+  border-radius: $btnBorderRadius;
+  padding: $btnPadding;
+}
+
+.smp-btn,
+.smp-btn:hover {
+  color: $primaryColor;
+}
+
+.smp-btn:hover {
+  background-color: $btnBackgroundColorHover;
+}
+
+.smp-back {
+  display: flex;
+  justify-content: flex-end;
+
+  .smp-btn {
+    margin-bottom: 30px;
+  }
+}
+
+// Common for lists
+.smp-list {
+  font-size: 1.2em;
+  line-height: 1.8;
+  margin-bottom: $verticalSpace;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+      color: #9a9a9a;
+      list-style-type: none;
+      white-space: nowrap;
+    }
+  }
+}
+
+.smp-list__title,
+.post-content .smp-list__title {
+  background-color: $primaryColor; // TODO: Pull this in as a theme variable
+  color: white;
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: normal;
+  padding: 10px 0;
+  margin-top: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.smp-list__count {
+  color: #fff;
+  background-color: #b1b1b1;
+  vertical-align: middle;
+  margin-left: 5px;
+  padding: 2px 7px;
+  font-size: 11px;
+  position: relative;
+  top: -1px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+
+// [sermon_books_list] shortcode
+.smp-books-list {
+  ul {
+    column-count: 2;
+    column-gap: 0;
+  }
+}
+
+// [sermon_topics_list] shortcode
+.smp-topics-list {
+  ul {
+    column-gap: 0;
+
+    @media (min-width: 600px) {
+      column-count: 2;
+    }
+
+    @media (min-width: 960px) {
+      column-count: 3;
+    }
+  }
+}
+
+// [sermon_series_list] shortcode
+$gutterWidth: 15px;
+
+.smp-series-grid {
+  // TODO: col-sm-3 is used but may not be available in css
+  margin: 0 -#{$gutterWidth};
+
+  .smp-series-grid__item {
+    text-align: center;
+    float: left;
+    width: 50%;
+    padding: 0 $gutterWidth;
+
+    @media (min-width: 800px) {
+      width: 33.3%;
+    }
+
+    @media (min-width: 960px) {
+      width: 25%;
+    }
+
+    & > a {
+      display: block;
+    }
+  }
+
+  &.smp-series-grid--no-title {
+    .smp-series-grid__item {
+      margin-bottom: 2em;
+    }
+  }
+
+  .smp-series-grid__name {
+    margin-top: 0.7em;
+    color: #444;
+    font-size: 1em;
+    font-weight: 400;
+    line-height: 1.5em;
+    letter-spacing: 2px;
+    font-style: normal;
+
+    // Limit to 2 lines of text
+    height: 3em;
+    overflow: hidden;
+  }
+}
+
+// [sermon_filters] shortcode
+.smp-filters {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-size: 0.8em;
+
+  @media (min-width: 960px) {
+    font-size: 1em;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .smp-filters-tabs {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: $verticalSpace;
+  }
+
+  .smp-filters-tabs__tab {
+    display: block;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+
+    & > a,
+    & > span {
+      display: block;
+    }
+
+    & > a {
+      cursor: pointer;
+      padding: .7em .9em;
+
+      @media (min-width: 800px) {
+        padding-left: 1.2em;
+        padding-right: 1.2em;
+      }
+    }
+
+    & > span {
+      margin-right: 20px;
+    }
+  }
+
+  .smp-filters-tabs--primary {
+    border: $btnBorderWidth solid $btnBorderColor;
+    border-radius: $btnBorderRadius;
+    margin-right: 20px;
+
+    .smp-filters-tabs__tab {
+      & > a {
+        color: $activeColor;
+      }
+
+      &:hover > a {
+        background-color: $btnBackgroundColorHover;
+      }
+
+      &:first-child {
+        & > a {
+          border-right: $btnBorderWidth solid $activeColor;
+        }
+      }
+    }
+  }
+
+  $secondaryBackgroundColor: #b5b5b5;
+
+  .smp-filters-tabs--secondary {
+    .smp-filters-tabs__tab {
+      & > a {
+        color: #fff;
+        background-color: $secondaryBackgroundColor;
+        margin-right: $btnBorderWidth;
+      }
+
+      &:hover > a {
+        background-color: #a5a5a5;
+      }
+
+      &:nth-child(2) {
+        & > a {
+          border-top-left-radius: $btnBorderRadius;
+          border-bottom-left-radius: $btnBorderRadius;
+        }
+      }
+
+      &:last-child {
+        & > a {
+          border-top-right-radius: $btnBorderRadius;
+          border-bottom-right-radius: $btnBorderRadius;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  .smp-filters-tabs__tab.active,
+  .smp-filters-tabs__tab.active:hover {
+    & > a {
+      background-color: $activeColor;
+      color: #fff;
+    }
+  }
+}
+
+.smp-content-section {
+  margin-bottom: $verticalSpace;
+
+  &.hidden {
+    display: none;
+  }
+}

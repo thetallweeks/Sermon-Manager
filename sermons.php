@@ -335,6 +335,9 @@ class SermonManager { // phpcs:ignore
 			return;
 		}
 
+		wp_enqueue_style( 'wpfc-smp-styles' );
+		wp_enqueue_script( 'wpfc-smp-script' );
+
 		if ( ! ( defined( 'SM_ENQUEUE_SCRIPTS_STYLES' ) || 'wpfc_sermon' === get_post_type() || is_post_type_archive( 'wpfc_sermon' ) )
 		) {
 			return;
@@ -421,6 +424,8 @@ class SermonManager { // phpcs:ignore
 
 			wp_localize_script( 'wpfc-sm-verse-script', 'verse', $verse_popup_data );
 		}
+
+		wp_enqueue_script( 'wpfc-smp-script' );
 
 		// Do not enqueue twice.
 		define( 'SM_SCRIPTS_STYLES_ENQUEUED', true );
@@ -540,8 +545,10 @@ class SermonManager { // phpcs:ignore
 		wp_register_script( 'wpfc-sm-plyr', SM_URL . 'assets/vendor/js/plyr.polyfilled' . ( ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) ? '' : '.min' ) . '.js', array(), '3.4.7', SermonManager::getOption( 'player_js_footer' ) );
 		wp_register_script( 'wpfc-sm-plyr-loader', SM_URL . 'assets/js/plyr' . ( ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) ? '' : '.min' ) . '.js', array( 'wpfc-sm-plyr' ), SM_VERSION );
 		wp_register_script( 'wpfc-sm-verse-script', SM_URL . 'assets/vendor/js/verse.js', array(), SM_VERSION );
+		wp_register_script( 'wpfc-smp-script', SM_URL . 'assets/js/sermon-manager-plus.js', array('jquery'), SM_VERSION);
 		wp_register_style( 'wpfc-sm-styles', SM_URL . 'assets/css/sermon.min.css', array(), SM_VERSION );
 		wp_register_style( 'wpfc-sm-plyr-css', SM_URL . 'assets/vendor/css/plyr.min.css', array(), '3.4.7' );
+		wp_register_style( 'wpfc-smp-styles', SM_URL . 'assets/css/smp.css', array(), SM_VERSION);
 
 		// Register theme-specific styling, if there's any.
 		if ( file_exists( SM_PATH . 'assets/css/theme-specific/' . get_option( 'template' ) . '.css' ) ) {
@@ -552,7 +559,7 @@ class SermonManager { // phpcs:ignore
 		if ( file_exists( get_stylesheet_directory() . '/sermon.css' ) ) {
 			wp_register_style( 'wpfc-sm-style-theme', get_stylesheet_directory_uri() . '/sermon.css', array( 'wpfc-sm-styles' ), SM_VERSION );
 		}
-		
+
 	}
 
 	/**
@@ -634,7 +641,7 @@ class SermonManager { // phpcs:ignore
 							}
 						}
 					}
-					
+
 				}
 			}
 		);
@@ -808,8 +815,8 @@ class SermonManager { // phpcs:ignore
 		add_action(
 			'save_post_wpfc_sermon',
 			function ( $post_ID, $post, $update ) {
-				error_log("1888");			
-				error_log(print_r($_POST,true));			
+				error_log("1888");
+				error_log(print_r($_POST,true));
 				// error_log(print_r($_POST),true);
 				if ( ! isset( $_POST['sermon_audio_id'] ) && ! isset( $_POST['sermon_audio'] ) ) {
 					return;
@@ -935,18 +942,18 @@ add_filter(
 
 add_action("edit_post","update_multiple_sermon_meta_data");
 function update_multiple_sermon_meta_data($post_ID){
-	$notes = get_wpfc_sermon_meta( 'sermon_notes' );	
+	$notes = get_wpfc_sermon_meta( 'sermon_notes' );
 	if(is_array($notes)){
 		if(count($notes)>0){
 			update_post_meta($post_ID, 'sermon_notes_multiple', $notes );
 			update_post_meta($post_ID, 'sermon_notes', '' );
 		}
 	}
-	$bulletin = get_wpfc_sermon_meta( 'sermon_bulletin' );	
+	$bulletin = get_wpfc_sermon_meta( 'sermon_bulletin' );
 	if(is_array($bulletin)){
 		if(count($bulletin)>0){
 			update_post_meta($post_ID, 'sermon_bulletin_multiple', $bulletin );
-			update_post_meta($post_ID, 'sermon_bulletin', '' );			
+			update_post_meta($post_ID, 'sermon_bulletin', '' );
 		}
 	}
 	return;
@@ -956,6 +963,6 @@ function on_post_view_update_multiple_sermon_meta_data()
 {
     if ('wpfc_sermon' === get_post_type() && is_singular()){
     	update_multiple_sermon_meta_data(get_the_ID());
-    	
+
     }
 }

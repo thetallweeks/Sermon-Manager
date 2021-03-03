@@ -39,6 +39,14 @@ class SM_Shortcodes {
 		// Filtering shortcode.
 		add_shortcode( 'sermon_sort_fields', array( self::get_instance(), 'display_sermon_sorting' ) );
 
+		// Custom shortcodes
+		add_shortcode('sermon_books_list', array(self::get_instance(), 'display_sermon_books_list'));
+    add_shortcode('sermon_series_list', array(self::get_instance(), 'display_sermon_series_list'));
+    add_shortcode('sermon_topics_list', array(self::get_instance(), 'display_sermon_topics_list'));
+    add_shortcode('current_sermon_series', array(self::get_instance(), 'display_sermons_for_series'));
+    add_shortcode('sermon_filters', array(self::get_instance(), 'display_sermon_filters'));
+    add_shortcode('sermon_explorer', array(self::get_instance(), 'display_sermon_explorer'));
+
 		// Load deprecated shortcode aliasing.
 		$this->legacy_shortcodes();
 	}
@@ -458,7 +466,7 @@ class SM_Shortcodes {
 		} elseif ( ! $this->convert_taxonomy_name( $args['display'], false ) ) {
 			return '<strong>Error: Invalid "list" parameter.</strong><br> Possible values are: "series", "preachers", "topics" and "books".<br> You entered: "<em>' . $args['display'] . '</em>"';
 		}
-		
+
 		// Format args.
 		$args = array(
 			'taxonomy'  => $args['display'],
@@ -775,7 +783,7 @@ class SM_Shortcodes {
 	 * @return string
 	 */
 	function display_sermons( $atts = array() ) {
-		
+
 		global $post_ID;
 
 		// Enqueue scripts and styles.
@@ -804,7 +812,7 @@ class SM_Shortcodes {
 					SermonManager::$description = $value;
 				}
 			}
-		}		
+		}
 		// Default options.
 		$args = array(
 			'per_page'           => get_option( 'posts_per_page' ) ?: 10,
@@ -1251,6 +1259,244 @@ class SM_Shortcodes {
 
 		return render_wpfc_sorting( $args );
 	}
+
+	public static function should_show($value)
+  {
+    return $value !== true && !in_array($value, array('yes', 1, '1'));
+  }
+
+  public function display_sermon_books_list($atts = array())
+  {
+    $old_testament = array(
+      'Genesis',
+      'Exodus',
+      'Leviticus',
+      'Numbers',
+      'Deuteronomy',
+      'Joshua',
+      'Judges',
+      'Ruth',
+      '1 Samuel',
+      '2 Samuel',
+      '1 Kings',
+      '2 Kings',
+      '1 Chronicles',
+      '2 Chronicles',
+      'Ezra',
+      'Nehemiah',
+      'Esther',
+      'Job',
+      'Psalms',
+      'Proverbs',
+      'Ecclesiastes',
+      'Song of Songs',
+      'Isaiah',
+      'Jeremiah',
+      'Lamentations',
+      'Ezekiel',
+      'Daniel',
+      'Hosea',
+      'Joel',
+      'Amos',
+      'Obadiah',
+      'Jonah',
+      'Micah',
+      'Nahum',
+      'Habakkuk',
+      'Zephaniah',
+      'Haggai',
+      'Zechariah',
+      'Malachi'
+    );
+
+    $new_testament = array(
+      'Matthew',
+      'Mark',
+      'Luke',
+      'John',
+      'Acts',
+      'Romans',
+      '1 Corinthians',
+      '2 Corinthians',
+      'Galatians',
+      'Ephesians',
+      'Philippians',
+      'Colossians',
+      '1 Thessalonians',
+      '2 Thessalonians',
+      '1 Timothy',
+      '2 Timothy',
+      'Titus',
+      'Philemon',
+      'Hebrews',
+      'James',
+      '1 Peter',
+      '2 Peter',
+      '1 John',
+      '2 John',
+      '3 John',
+      'Jude',
+      'Revelation'
+    );
+
+    $taxonomy = 'wpfc_bible_book';
+
+    $query_args = array(
+      'taxonomy'   => $taxonomy,
+      'hide_empty' => false,
+    );
+
+    $terms = get_terms($query_args);
+
+    $html = '';
+    $html .= wpfc_get_partial('content-smp-books', array(
+      'old_testament'      => $old_testament,
+      'new_testament'      => $new_testament,
+      'terms'              => $terms,
+    ));
+
+    return $html;
+  }
+
+  // Based on SM_Shortcodes display_images
+  public function display_sermon_series_list($atts = array())
+  {
+    // Enqueue scripts and styles.
+    if (!defined('SM_ENQUEUE_SCRIPTS_STYLES')) {
+      define('SM_ENQUEUE_SCRIPTS_STYLES', true);
+    }
+
+    // Unquote.
+    if (is_array($atts) || is_object($atts)) {
+      foreach ($atts as &$att) {
+        $att = $this->_unquote($att);
+      }
+    }
+
+    $args = array(
+      'display'          => 'series',
+			'order'            => 'ASC',
+      'orderby'          => 'name',
+			'size'             => 'sermon_medium',
+			'hide_title'       => false
+		);
+
+    $args = shortcode_atts($args, $atts, 'sermon_series_list');
+
+    // Format args.
+    $args += array(
+      'taxonomy'   => 'wpfc_sermon_series',
+      'term_args'  => array(
+        'order'    => strtoupper($args['order']),
+        'orderby'  => $args['orderby'],
+      ),
+    );
+
+    // Get images.
+    $terms = apply_filters('sermon-images-get-terms', '', $args); // phpcs:ignore
+
+    $html = '';
+    $html .= wpfc_get_partial('content-smp-series', array(
+      'terms'       => $terms,
+      'size'        => $args['size'],
+      'hide_title'  => $args['hide_title']
+    ));
+
+    return $html;
+  }
+
+  public function display_sermon_topics_list($atts = array())
+  {
+    $taxonomy = 'wpfc_sermon_topics';
+
+    $query_args = array(
+      'taxonomy'   => $taxonomy,
+      'hide_empty' => false,
+    );
+
+    $terms = get_terms($query_args);
+
+    $html = '';
+    $html .= wpfc_get_partial('content-smp-topics', array(
+      'terms' => $terms
+    ));
+
+    return $html;
+  }
+
+  public function display_sermons_for_series($atts = array())
+  {
+    $html = '';
+
+    // TODO: Determine a default value
+    $args = array(
+      'filter_by'          => 'wpfc_sermon_series',
+      'filter_value'       => $atts['series_name'],
+      'per_page'           => -1,
+      'disable_pagination' => 1,
+
+      // Defaults from Sermon Manager for Wordpress
+      'sermons'            => false, // Show only sermon IDs that are set here.
+      'order'              => strtoupper(SermonManager::getOption('archive_order')),
+      'orderby'            => SermonManager::getOption('archive_orderby'),
+      'image_size'         => 'post-thumbnail',
+      'year'               => '',
+      'month'              => '',
+      'after'              => '',
+      'before'             => '',
+      'hide_filters'       => true,
+      'hide_topics'        => '',
+      'hide_series'        => '',
+      'hide_preachers'     => '',
+      'hide_books'         => '',
+      'hide_dates'         => '',
+      'include'            => '',
+      'exclude'            => '',
+      'hide_service_types' => \SermonManager::getOption('service_type_filtering') ? '' : 'yes',
+    );
+
+    $args = shortcode_atts($args, $atts, 'current_sermon_series');
+
+    if (class_exists('SM_Shortcodes')) {
+      $sm_shortcodes = SM_Shortcodes::get_instance();
+      $html .= $sm_shortcodes->display_sermons($args);
+    }
+
+    return $html;
+  }
+
+  public function display_sermon_filters($atts = array())
+  {
+    $args = array(
+      'hide_series' => false,
+      'hide_books'  => false,
+      'hide_topics' => false
+    );
+
+    $args = shortcode_atts($args, $atts, 'sermon_filters');
+
+    $html = '';
+    $html .= wpfc_get_partial('content-smp-filters', $args);
+
+    return $html;
+  }
+
+  public function display_sermon_explorer($atts = array())
+  {
+    $args = array(
+      'hide_series'    => false,
+      'hide_books'     => false,
+      'hide_topics'    => false,
+      'current_series' => $atts['current_series']
+    );
+
+    $args = shortcode_atts($args, $atts, 'sermon_explorer');
+
+    $html = '';
+    $html .= wpfc_get_partial('content-smp-explorer', $args);
+
+    return $html;
+  }
 }
 
 $sm_shortcodes = new SM_Shortcodes;
